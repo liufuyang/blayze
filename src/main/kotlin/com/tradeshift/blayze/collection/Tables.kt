@@ -1,80 +1,80 @@
 package com.tradeshift.blayze.collection
 
 /**
- * A table class which can be used to store and access value via a RowKey and a ColumnKey
+ * A table class which can be used to store and access value via a String and a String
  */
 
-interface Table<RowKey, ColumnKey, V>{
-    val entries: Set<Map.Entry<Pair<RowKey, ColumnKey>, V>>
-    val rowKeySet: Set<RowKey>
-    val columnKeySet: Set<ColumnKey>
+interface Table{
+    val entries: Set<Map.Entry<Pair<String, String>, Int>>
+    val rowKeySet: Set<String>
+    val columnKeySet: Set<String>
 
-    operator fun get(k1: RowKey, k2: ColumnKey): V?
-    fun toMutableTable(): MutableTable<RowKey, ColumnKey, V>
-    fun toTable(): Table<RowKey, ColumnKey, V>
+    operator fun get(k1: String, k2: String): Int?
+    fun toMutableTable(): MutableTable
+    fun toTable(): Table
 }
 
-interface MutableTable<RowKey, ColumnKey, V> : Table<RowKey, ColumnKey, V> {
-    fun put(rowKey: RowKey, columnKey: ColumnKey, value: V)
+interface MutableTable : Table {
+    fun put(rowKey: String, columnKey: String, value: Int)
 
 }
 
 /**
- * A table implementation based on a Map<Pair<RowKey, ColumnKey>, V>
+ * A table implementation based on a Map<Pair<String, String>, Int>
  */
-class MapTable<RowKey, ColumnKey, V>(val map: Map<Pair<RowKey, ColumnKey>, V> = mapOf()) : Table<RowKey, ColumnKey, V> {
-    override val entries: Set<Map.Entry<Pair<RowKey, ColumnKey>, V>> = map.entries
+class MapTable(val map: Map<Pair<String, String>, Int> = mapOf()) : Table {
+    override val entries: Set<Map.Entry<Pair<String, String>, Int>> = map.entries // .map { (k, v) -> k.first.toString() + k.second.toString() to v }.toSet()
 
-    override val rowKeySet: Set<RowKey> by lazy { // as table is immutable, we use lazy delegates to only compute the property once on first access
+    override val rowKeySet: Set<String> by lazy { // as table is immutable, we use lazy delegates to only compute the property once on first access
         map.keys.map { it.first }.toSet()
     }
 
-    override val columnKeySet: Set<ColumnKey> by lazy {
+    override val columnKeySet: Set<String> by lazy {
         map.keys.map { it.second }.toSet()
     }
 
-    override operator fun get(k1: RowKey, k2: ColumnKey) = map[k1 to k2]
+    override operator fun get(k1: String, k2: String) = map[k1 to k2]
 
-    override fun toMutableTable(): MutableTable<RowKey, ColumnKey, V> {
+    override fun toMutableTable(): MutableTable {
         return MutableMapTable(map.toMutableMap())
     }
 
-    override fun toTable(): Table<RowKey, ColumnKey, V> {
+    override fun toTable(): Table {
         return this
     }
 }
 
 /**
- * A mutable table implementation based on a Map<Pair<RowKey, ColumnKey>, V>
+ * A mutable table implementation based on a Map<Pair<String, String>, Int>
  */
-class MutableMapTable<RowKey, ColumnKey, V>(
-        val map: MutableMap<Pair<RowKey, ColumnKey>, V> = mutableMapOf()
-) : MutableTable<RowKey, ColumnKey, V>{
+class MutableMapTable(
+        val map: MutableMap<Pair<String, String>, Int> = mutableMapOf()
+) : MutableTable{
 
-    override val entries: Set<Map.Entry<Pair<RowKey, ColumnKey>, V>>
-        get() = map.entries
+    override val entries
+        get() = map.entries // .map { (k, v) -> k.first.toString() + k.second.toString() to v }.toSet()
 
-    override val rowKeySet: Set<RowKey>
+    override val rowKeySet: Set<String>
         get() = map.keys.map { it.first }.toSet()
 
-    override val columnKeySet: Set<ColumnKey>
+    override val columnKeySet: Set<String>
         get() = map.keys.map { it.second }.toSet()
 
-    override operator fun get(k1: RowKey, k2: ColumnKey) = map[k1 to k2]
+    override operator fun get(k1: String, k2: String) = map[k1 to k2]
 
-    override fun put(rowKey: RowKey, columnKey: ColumnKey, value: V) {
+    override fun put(rowKey: String, columnKey: String, value: Int) {
         map[rowKey to columnKey] = value
     }
 
-    override fun toTable(): Table<RowKey, ColumnKey, V> {
+    override fun toTable(): Table {
         return MapTable(map.toMap())
     }
 
-    override fun toMutableTable(): MutableTable<RowKey, ColumnKey, V> {
+    override fun toMutableTable(): MutableTable {
         return this
     }
 }
 
-fun <RowKey, ColumnKey, V> tableOf(pairs: Iterable<Pair<Pair<RowKey, ColumnKey>, V>>): Table<RowKey, ColumnKey, V> = MapTable(pairs.toMap())
-fun <RowKey, ColumnKey, V> tableOf(vararg pairs: Pair<Pair<RowKey, ColumnKey>, V>): Table<RowKey, ColumnKey, V> = MapTable(pairs.toMap())
-fun <RowKey, ColumnKey, V> mutableTableOf(vararg pairs: Pair<Pair<RowKey, ColumnKey>, V>): MutableTable<RowKey, ColumnKey, V> = MutableMapTable(pairs.toMap().toMutableMap())
+//fun <String, String> tableOf(pairs: Iterable<Pair<Pair<String, String>, Int>>): Table = MapTable(pairs.toMap())
+//fun <String, String> tableOf(vararg pairs: Pair<Pair<String, String>, Int>): Table = MapTable(pairs.toMap())
+//fun <String, String> mutableTableOf(vararg pairs: Pair<Pair<String, String>, Int>): MutableTable = MutableMapTable(pairs.toMap().toMutableMap())

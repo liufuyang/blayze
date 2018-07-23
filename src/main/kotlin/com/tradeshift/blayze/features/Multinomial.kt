@@ -18,7 +18,7 @@ import kotlin.math.pow
 class Multinomial(
         private val includeFeatureProbability: Double = 1.0,
         private val pseudoCount: Double = 1.0,
-        private val countTable: Table<String, String, Int> = tableOf()
+        private val countTable: Table = tableOf()
 ) : Feature<Multinomial, Counter<String>> {
 
     private val outcomeCounter: Counter<String> by lazy { sumColumns(countTable) }
@@ -27,11 +27,16 @@ class Multinomial(
         val updatedTable = countTable.toMutableTable()
 
         val knownFeatures = updatedTable.columnKeySet.toMutableSet()
+        var i = 1
+        println("---" + updates.size)
         for ((outcome, counts) in updates) {
+            println(i)
+            i ++
             for ((feature, value) in counts) {
                 if (knownFeatures.contains(feature) || Math.random() < (1.0 - (1.0 - includeFeatureProbability).pow(value))) {
                     knownFeatures.add(feature)
                     val count = updatedTable[outcome, feature] ?: 0
+
                     updatedTable.put(outcome, feature, count + value)
                 }
             }
@@ -55,7 +60,7 @@ class Multinomial(
         return results
     }
 
-    private fun sumColumns(table: Table<String, String, Int>): Counter<String> {
+    private fun sumColumns(table: Table): Counter<String> {
         val counts = mutableMapOf<String, Int>()
         for (cell in table.entries) {
             val outcome = cell.key.first

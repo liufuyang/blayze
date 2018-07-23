@@ -32,7 +32,7 @@ class TableTest {
                 "1" to "a" to 1,
                 "1" to "b" to 2,
                 "2" to "a" to 3,
-                "2" to "b" to 4
+                "2" to "b" to 4 // TODO - re-evaluate the idea of str + str as key - not good
         )
         assertEquals(localMap.entries, table.entries)
     }
