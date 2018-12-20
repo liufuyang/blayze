@@ -44,14 +44,19 @@ class Text(private val delegate: Multinomial = Multinomial()) : Feature<Text, Fe
         fun countWords(q: String): Counter<String> {
             // https://www.regular-expressions.info/unicode.html
             val words = q
-                    .replace("[^\\p{L}\\p{N}]+".toRegex(), " ") // only keep any kind of letter and numbers from any language, others become space
+                    .replace("[^a-zA-Z]+".toRegex(), " ") // only keep any kind of letter and numbers from any language, others become space
                     .trim()
                     .toLowerCase()
                     .split(" ")
-                    .filter { it !in stopWords }
+                    //.filter { it !in stopWords }
             // with this setup, the 20newsgroup score is above 0.64
 
-            return Counter(words)
+            val bigramWords =
+                        words.mapIndexed { index, w ->
+                            if (index < words.size - 1) "$w ${words[index + 1]}" else "TheLastWordToBeRemoved"
+                        }.dropLast(1)
+
+            return Counter(words + bigramWords)
         }
     }
 }

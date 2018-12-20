@@ -225,7 +225,7 @@ class ModelTest {
                 }
                 .toList()
                 .average()
-
+        println(acc)
         assertTrue("expected $acc > 0.65", acc > 0.65) // sklearn MultinomialNB with a CountVectorizer gets ~0.646
     }
 
