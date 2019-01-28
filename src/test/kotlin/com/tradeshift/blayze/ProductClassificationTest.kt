@@ -10,12 +10,12 @@ import kotlin.streams.toList
 class ProductClassificationTest {
 
     @Test
-    fun can_fit_20newsgroup() {
-        val train = productClassification("train.csv")
+    fun can_fit_productClassification() {
+        val train = productClassification("train5.csv")
         val model = Model(textFeatures = mapOf("q" to Text(pseudoCount = 0.001, includeFeatureProbability = 1.0))).batchAdd(train)
 
         println("training finished")
-        val test = productClassification("test.csv")
+        val test = productClassification("test5.csv")
         val acc = test
                 .parallelStream()
                 .map {
@@ -28,15 +28,7 @@ class ProductClassificationTest {
                 .toList()
                 .average()
         //println(model.predict(Inputs(mapOf("q" to "gloves"))).maxBy { it.value })
-//        println(model.predict(Inputs(mapOf("q" to "CDEFECBFCCE"))).maxBy { it.value })
-//        println(model.predict(Inputs(mapOf("q" to "abcdduvytrbsjhcgsbfgswofyvzojdnfys"))).maxBy { it.value })
-//        println(model.predict(Inputs(mapOf("q" to "mittens"))).maxBy { it.value })
-//        println(model.predict(Inputs(mapOf("q" to "mittenx"))).maxBy { it.value })
-//        println(model.predict(Inputs(mapOf("q" to "glof"))).maxBy { it.value })
-
-        //println(model.predict(Inputs(mapOf("q" to "asfdasdfasdfasdfasfdadfafd"))).maxBy { it.value })
         println(acc)
-        //Assert.assertTrue(acc > 0.65) // sklearn MultinomialNB with a CountVectorizer gets ~0.646
     }
 
     fun productClassification(fname: String): List<Update> {
