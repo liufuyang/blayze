@@ -12,7 +12,9 @@ class ProductClassificationTest {
     @Test
     fun can_fit_productClassification() {
         val train = productClassification("train5.csv")
-        val model = Model(textFeatures = mapOf("q" to Text(pseudoCount = 0.001, includeFeatureProbability = 1.0))).batchAdd(train)
+        var model = Model(textFeatures = mapOf("q" to Text(pseudoCount = 0.001, includeFeatureProbability = 1.0)))
+
+        train.chunked(100_000).forEach {model = model.batchAdd(it)}
 
         println("training finished")
         val test = productClassification("test5.csv")
